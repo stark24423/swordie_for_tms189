@@ -21,7 +21,7 @@ import static net.swordie.ms.connection.crypto.BitTools.multiplyBytes;
 
 /**
  * Artifact from Invictus that improved the old MapleAESOFB by
- * making it easily scaled with session groups while using Apache's 
+ * making it easily scaled with session groups while using Apache's
  * MINA library. Ported over for usage within a Netty setup since it will
  * work exactly the same.
  *
@@ -47,9 +47,8 @@ public final class MapleCrypto {
      */
     private static short gVersion, sVersion, rVersion;
     /**
-     * Used for renewing the cryptography seed for sending or receiving 
+     * Used for renewing the cryptography seed for sending or receiving
      * packets.
-     *
      */
     public static final int[] SHUFFLE_BYTES = new int[]{0xEC, 0x3F, 0x77, 0xA4, 0x45, 0xD0, 0x71, 0xBF, 0xB7, 0x98, 0x20, 0xFC,
             0x4B, 0xE9, 0xB3, 0xE1, 0x5C, 0x22, 0xF7, 0x0C, 0x44, 0x1B, 0x81, 0xBD, 0x63, 0x8D, 0xD4, 0xC3,
@@ -78,16 +77,16 @@ public final class MapleCrypto {
         cipher = new AES();
         // key changes later on in version
         cipher.setKey(new byte[]{
-                (byte) 0xB3, 0x00, 0x00, 0x00,
-                (byte) 0x2C, 0x00, 0x00, 0x00,
-                (byte) 0x96, 0x00, 0x00, 0x00,
-                (byte) 0x65, 0x00, 0x00, 0x00,
-                (byte) 0x99, 0x00, 0x00, 0x00,
+                (byte) 0x5B, 0x00, 0x00, 0x00,
+                (byte) 0x8F, 0x00, 0x00, 0x00,
+                (byte) 0xE5, 0x00, 0x00, 0x00,
                 (byte) 0x32, 0x00, 0x00, 0x00,
-                (byte) 0xD0, 0x00, 0x00, 0x00,
-                (byte) 0x41, 0x00, 0x00, 0x00
+                (byte) 0x84, 0x00, 0x00, 0x00,
+                (byte) 0xA7, 0x00, 0x00, 0x00,
+                (byte) 0xEE, 0x00, 0x00, 0x00,
+                (byte) 0x2F, 0x00, 0x00, 0x00
         });
-    }
+}
 
     /**
      * Initializes the send and receive version values for net.swordie.ms.connection.packet
@@ -105,10 +104,9 @@ public final class MapleCrypto {
      * Cryptography segment of MapleAESOFB.
      *
      * @param delta the input data to be put into stage for finalized encryption
-     * or to be finally decryption.
+     *              or to be finally decryption.
      * @param gamma the input seed for this cryptography stage. This value is
-     * renewed after each encryption by the corresponding encoder or decoder.
-     *
+     *              renewed after each encryption by the corresponding encoder or decoder.
      * @return the bytes having been converted to a stage for encryption or
      * being fully decrypted.
      */
@@ -146,7 +144,6 @@ public final class MapleCrypto {
      *
      * @param delta the input net.swordie.ms.connection.packet length before adding the header.
      * @param gamma the input sending seed before changing it.
-     *
      * @return the header to be sent with this net.swordie.ms.connection.packet.
      */
     public static byte[] getHeader(int delta, byte[] gamma) {
@@ -156,7 +153,7 @@ public final class MapleCrypto {
         int dataLen = ((delta & 0xFF) << 8) | ((delta & 0xFF00) >>> 8);
         dataLen ^= rawSeq;
         int headerLen = 4;
-        if (delta >= 0xFF00)  {
+        if (delta >= 0xFF00) {
             headerLen += 4;
             dataLen = 0xFFFF ^ rawSeq;
         }
@@ -165,7 +162,7 @@ public final class MapleCrypto {
         ret[1] = (byte) (rawSeq & 0xFF);
         ret[2] = (byte) ((dataLen >>> 8) & 0xFF);
         ret[3] = (byte) (dataLen & 0xFF);
-        if (headerLen > 4)  {
+        if (headerLen > 4) {
             delta ^= ((rawSeq & 0xFF) << 8) | ((rawSeq & 0xFF00) >>> 8);
             ret[4] = (byte) (delta & 0xFF);
             ret[5] = (byte) ((delta >> 8) & 0xFF);
@@ -193,7 +190,6 @@ public final class MapleCrypto {
      * Gets the length of the net.swordie.ms.connection.packet given the received header.
      *
      * @param delta the net.swordie.ms.connection.packet header to be used to find the net.swordie.ms.connection.packet length.
-     *
      * @return the length of the received net.swordie.ms.connection.packet.
      */
     public static int getLength(int delta) {
@@ -208,7 +204,6 @@ public final class MapleCrypto {
      *
      * @param delta the net.swordie.ms.connection.packet header from the received net.swordie.ms.connection.packet (4 bytes in length).
      * @param gamma the current receive seed.
-     *
      * @return whether or not the net.swordie.ms.connection.packet is valid (consequently, if not valid,
      * the session is terminated usually).
      */
@@ -224,11 +219,11 @@ public final class MapleCrypto {
     }
 
     /**
-     * @see MapleAES#checkPacket(byte[], byte[]) same thing as this method,
-     * except that we convert the integer net.swordie.ms.connection.packet header (4 bytes combined)
-     * into an array of the first 2 bytes of the integer net.swordie.ms.connection.packet header.
      * @param delta foreign header.
      * @param gamma current receive seed.
+     * @seeMapleAES#checkPacket(byte[], byte[]) same thing as this method,
+     * except that we convert the integer net.swordie.ms.connection.packet header (4 bytes combined)
+     * into an array of the first 2 bytes of the integer net.swordie.ms.connection.packet header.
      */
     public static boolean checkPacket(int delta, byte[] gamma) {
         byte[] a = new byte[2];
@@ -243,7 +238,6 @@ public final class MapleCrypto {
      * rolling the seed is important to keeping a valid session.
      *
      * @param delta the old seed or IV to be changed into the new one.
-     *
      * @return the new seed or IV to be used for this stage of cryptography
      * for the next net.swordie.ms.connection.packet sent or received.
      */

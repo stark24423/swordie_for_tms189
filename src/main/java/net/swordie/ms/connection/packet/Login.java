@@ -44,7 +44,16 @@ public class Login {
 
     public static OutPacket sendAuthServer(boolean useAuthServer) {
         OutPacket outPacket = new OutPacket(OutHeader.AUTH_SERVER.getValue());
-        outPacket.encodeByte(useAuthServer);
+        outPacket.encodeInt(0);
+        return outPacket;
+    }
+
+    public static OutPacket setLoginBackground() {
+        OutPacket outPacket = new OutPacket(OutHeader.SET_LOGIN_BACKGROUND);
+        String[] bg = {"MapLogin", "MapLogin0", "MapLogin1", "MapLogin2"};
+        outPacket.encodeString(bg[(int) (Math.random() * bg.length)]);
+        outPacket.encodeInt();
+
         return outPacket;
     }
 

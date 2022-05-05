@@ -2,7 +2,7 @@ drop table if exists equip_drops;
 
 create table equip_drops (
 	id int,
-    job varchar(255),
+    job varchar(240),
     level int,
 	primary key (id, job)
 );

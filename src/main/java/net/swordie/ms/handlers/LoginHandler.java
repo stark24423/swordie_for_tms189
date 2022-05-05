@@ -46,8 +46,8 @@ import static net.swordie.ms.enums.InvType.EQUIPPED;
 public class LoginHandler {
 
     private static final org.apache.log4j.Logger log = LogManager.getRootLogger();
-
-    @Handler(op = InHeader.PERMISSION_REQUEST)
+    //登入驗證
+    @Handler(op = InHeader.BEGIN_SOCKET)
     public static void handlePermissionRequest(Client client, InPacket inPacket) {
         byte locale = inPacket.decodeByte();
         short version = inPacket.decodeShort();
@@ -55,12 +55,19 @@ public class LoginHandler {
         if (locale != ServerConstants.LOCALE || version != ServerConstants.VERSION) {
             log.info(String.format("Client %s has an incorrect version.", client.getIP()));
             client.close();
+        }else{
+            log.info(String.format("玩家IP: %s 登入遊戲.", client.getIP()));
         }
     }
 
     @Handler(op = InHeader.USE_AUTH_SERVER)
     public static void handleAuthServer(Client client, InPacket inPacket) {
         client.write(Login.sendAuthServer(false));
+    }
+
+    @Handler(op = InHeader.GET_LOGIN_BACKGROUND)
+    public static void getLoginBackground(Client client, InPacket inPacket) {
+        client.write(Login.(false));
     }
 
     @Handler(op = InHeader.APPLIED_HOT_FIX)

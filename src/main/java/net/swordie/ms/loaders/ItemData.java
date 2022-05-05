@@ -246,17 +246,18 @@ public class ItemData {
     public static void loadEquipsFromWz() {
         String wzDir = ServerConstants.WZ_DIR + "/Character.wz";
         String[] subMaps = new String[]{"Accessory", "Android", "Cap", "Cape", "Coat", "Dragon", "Face", "Glove",
-                "Longcoat", "Mechanic", "Pants", "PetEquip", "Ring", "Shield", "Shoes", "Totem", "Weapon", "MonsterBook"};
+                "Longcoat", "Mechanic", "Pants", "PetEquip", "Ring", "Shield", "Shoes", "Totem", "Weapon"};// "MonsterBook"};
         for (String subMap : subMaps) {
             File subDir = new File(String.format("%s/%s", wzDir, subMap));
             File[] files = subDir.listFiles();
             for (File file : files) {
+                //log.info(file.getName());
                 Node node = XMLApi.getRoot(file);
                 List<Node> nodes = XMLApi.getAllChildren(node);
                 for (Node mainNode : nodes) {
                     Map<String, String> attributes = XMLApi.getAttributes(mainNode);
                     String mainName = attributes.get("name");
-                    if (mainName != null) {
+                    if (mainName != null && attributes.get("name").replace(".img", "").matches("-?\\d+")) {
                         int itemId = Integer.parseInt(attributes.get("name").replace(".img", ""));
                         Equip equip = new Equip();
                         equip.setItemId(itemId);
@@ -1406,7 +1407,7 @@ public class ItemData {
                                         iri.setCount(Integer.parseInt(value));
                                         break;
                                     case "item":
-                                        iri.setItemID(Integer.parseInt(value));
+                                        iri.setItemID(Integer.parseInt(value.replace(" ","")));
                                         break;
                                     case "prob":
                                         iri.setProb(Double.parseDouble(value));

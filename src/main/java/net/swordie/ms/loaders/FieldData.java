@@ -178,10 +178,12 @@ public class FieldData {
         File dir = new File(wzDir);
         File[] files = dir.listFiles();
         for (File file : files) {
+
             if (file.listFiles() == null) {
                 continue;
             }
             for (File mapFile : file.listFiles()) {
+
                 Document doc = XMLApi.getRoot(mapFile);
                 Node node = XMLApi.getAllChildren(doc).get(0);
                 if (node == null) {
@@ -743,11 +745,17 @@ public class FieldData {
 
     public static void generateDatFiles() {
         log.info("Started generating field data.");
+        File fields = new File(ServerConstants.DAT_DIR + "/fields");
+        File WorldMap = new File(ServerConstants.DAT_DIR + "/worldMap.dat");
         long start = System.currentTimeMillis();
-        loadFieldInfoFromWz();
-        saveFields(ServerConstants.DAT_DIR + "/fields");
-        loadWorldMapFromWz();
-        saveWorldMap(ServerConstants.DAT_DIR + "/worldMap.dat");
+        if (!fields.exists()){
+            loadFieldInfoFromWz();
+            saveFields(ServerConstants.DAT_DIR + "/fields");
+        }
+        if(!WorldMap.exists()){
+            loadWorldMapFromWz();
+            saveWorldMap(ServerConstants.DAT_DIR + "/worldMap.dat");
+        }
         log.info(String.format("Completed generating field data in %dms.", System.currentTimeMillis() - start));
     }
 

@@ -56,10 +56,10 @@ public class Server extends Properties {
 	}
 
 	private void init(String[] args) {
-		log.info("Starting server.");
+		log.info("伺服器啟動!!");
 		long startNow = System.currentTimeMillis();
 		DatabaseManager.init();
-		log.info("Loaded Hibernate in " + (System.currentTimeMillis() - startNow) + "ms");
+		log.info("載入 Hibernate in " + (System.currentTimeMillis() - startNow) + "ms");
 
 		try {
 			checkAndCreateDat();
@@ -103,7 +103,7 @@ public class Server extends Properties {
 		File file = new File(ServerConstants.DAT_DIR + "/equips");
 		boolean exists = file.exists();
 		if (!exists) {
-			log.info("Dat files cannot be found (at least not the equip dats). All dats will now be generated. This may take a long while.");
+			log.info("找不到數據文件（至少不是裝備數據）。現在將生成所有數據。這可能需要很長時間。");
 			Util.makeDirIfAbsent(ServerConstants.DAT_DIR);
 			for (Class c : DataClasses.datCreators) {
 				try {
