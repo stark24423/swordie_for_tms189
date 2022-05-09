@@ -327,8 +327,9 @@ public class CharacterStat {
         outPacket.encodeInt(getCharacterId());
         outPacket.encodeInt(getCharacterIdForLog());
         outPacket.encodeInt(getWorldIdForLog());
-        outPacket.encodeString(getName(), 13);
+        outPacket.encodeString(getName(), 15);
         outPacket.encodeByte(getGender());
+        outPacket.encodeByte(0);//addCharCreateStats unk
         outPacket.encodeByte(getSkin());
         outPacket.encodeInt(getFace());
         outPacket.encodeInt(getHair());
@@ -355,39 +356,45 @@ public class CharacterStat {
         outPacket.encodeInt(getPop());
         outPacket.encodeInt(getWp()); // Waru
         outPacket.encodeInt(getGachExp());
+        outPacket.encodeFT(getLastLogout());//這裡少了一個time
         outPacket.encodeInt((int) getPosMap());
         outPacket.encodeByte(getPortal());
-        outPacket.encodeInt(0); // TODO figure out
+        //outPacket.encodeInt(0); // TODO figure out
         outPacket.encodeShort(getSubJob());
         if (JobConstants.isDemon(getJob()) || JobConstants.isXenon(getJob()) || JobConstants.isBeastTamer(getJob())) {
             outPacket.encodeInt(getDefFaceAcc());
         }
         outPacket.encodeByte(getFatigue());
         outPacket.encodeInt(getLastFatigueUpdateTime());
+        //性向開始
         outPacket.encodeInt(getCharismaExp());
         outPacket.encodeInt(getInsightExp());
         outPacket.encodeInt(getWillExp());
         outPacket.encodeInt(getCraftExp());
         outPacket.encodeInt(getSenseExp());
         outPacket.encodeInt(getCharmExp());
+        //性向結束
         getNonCombatStatDayLimit().encode(outPacket);
 
         outPacket.encodeInt(getPvpExp());
         outPacket.encodeByte(getPvpGrade());
         outPacket.encodeInt(getPvpPoint());
-        outPacket.encodeByte(2);
+        outPacket.encodeByte(6);
         /* Fuck that, setting the above byte lower than 2 will make all 3rd and 4th job that have the property
          ((skillID % 10000) / 10000 == 0) be bugged (you see the level, but can't actually use it). ?????????????*/
 
-        outPacket.encodeByte(getPvpModeType());
-        outPacket.encodeInt(getEventPoint());
+        outPacket.encodeByte(7);
+
+        outPacket.encodeInt(0);
+        outPacket.encodeInt(0);
+
         outPacket.encodeByte(getAlbaActivityID()); // part time job
         outPacket.encodeFT(getAlbaStartTime());
         outPacket.encodeInt(getAlbaDuration());
         outPacket.encodeByte(getAlbaSpecialReward());
         getCharacterCard().encode(outPacket);
         outPacket.encodeFT(getLastLogout());
-        outPacket.encodeByte(isBurning()); // bBurning
+        outPacket.encodeZero(31);
     }
 
     public FileTime getLastLogout() {

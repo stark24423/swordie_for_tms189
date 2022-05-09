@@ -14,7 +14,7 @@ import java.util.Set;
 public class JobConstants {
 
     public static final boolean enableJobs = true;
-    public static final int jobOrder = 8;
+    public static final int jobOrder = 186;
 
     public static boolean isPinkBean(short job) {
         return job == JobEnum.PINK_BEAN_0.getJobId() || job == JobEnum.PINK_BEAN_1.getJobId();

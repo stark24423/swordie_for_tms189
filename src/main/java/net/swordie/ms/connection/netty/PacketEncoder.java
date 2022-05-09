@@ -43,7 +43,7 @@ public final class PacketEncoder extends MessageToByteEncoder<Packet> {
 
         if (c != null) {
             if(!OutHeader.isSpamHeader(OutHeader.getOutHeaderByOp(outPacket.getHeader()))) {
-                log.debug("[Out]\t| " + outPacket);
+                log.debug("[Out]\t| "+"字元:"+outPacket.getLength() +"\t"+ outPacket);
             }
             byte[] iv = c.getSendIV();
             byte[] head = MapleCrypto.getHeader(data.length, iv);

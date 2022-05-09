@@ -16,4 +16,13 @@ public enum AccountType {
     public int getVal() {
         return val;
     }
+
+    public boolean isGM() {
+        if (val > 0) {
+            return true;
+        }else {
+            return false;
+        }
+
+    }
 }

@@ -38,7 +38,8 @@ public enum OutHeader {
     SET_HOT_FIX(36),
     SERVER_STATUS(40),     // 189 ready
     INIT_OPCODE_ENCRYPTION(40),
-    AUTH_SERVER(47),
+    AUTH_SERVER(46),        //189ready 楓之谷顯示視窗
+    CHANGE_BACKGROUND(41),
 
     // CChatSocket::ProcessPacket
     CHAT_LOGIN_RESULT(1),

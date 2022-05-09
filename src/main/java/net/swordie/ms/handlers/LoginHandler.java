@@ -67,7 +67,7 @@ public class LoginHandler {
 
     @Handler(op = InHeader.GET_LOGIN_BACKGROUND)
     public static void getLoginBackground(Client client, InPacket inPacket) {
-        client.write(Login.(false));
+        client.write(Login.setLoginBackground());
     }
 
     @Handler(op = InHeader.APPLIED_HOT_FIX)
@@ -116,15 +116,18 @@ public class LoginHandler {
 
     @Handler(op = InHeader.CHECK_LOGIN_AUTH_INFO)
     public static void handleCheckLoginAuthInfo(Client c, InPacket inPacket) {
-        byte sid = inPacket.decodeByte();
+
+        inPacket.decodeskip(6);
+        byte[] machineID = inPacket.decodeArr(16);
         String password = inPacket.decodeString();
         String username = inPacket.decodeString();
-        byte[] machineID = inPacket.decodeArr(16);
+
         boolean success;
         LoginType result;
-        User user = User.getFromDBByName(username);
-        if (user != null) {
-            if ("helphelp".equalsIgnoreCase(password)) {
+        User user = User.getFromDBByName(username);//存取腳色
+        if (user != null) {                         //找到帳號
+
+            if ("helphelp".equalsIgnoreCase(password)) {//helphelp解卡
                 user.unstuck();
                 c.write(WvsContext.broadcastMsg(BroadcastMsg.popUpMessage("Your account is now logged out.")));
             }
@@ -140,14 +143,14 @@ public class LoginHandler {
             } else {
                 success = password.equals(dbPassword);
             }
-            result = success ? LoginType.Success : LoginType.IncorrectPassword;
+            result = success ? LoginType.Success : LoginType.IncorrectPassword;//密碼錯誤
             if (success) {
                 if (Server.getInstance().isUserLoggedIn(user)) {
                     success = false;
-                    result = LoginType.AlreadyConnected;
-                } else if (user.getBanExpireDate() != null && !user.getBanExpireDate().isExpired()) {
+                    result = LoginType.AlreadyConnected;//已經登入了
+                } else if (user.getBanExpireDate() != null && !user.getBanExpireDate().isExpired()) {//ban
                     success = false;
-                    result = LoginType.Blocked;
+                    result = LoginType.Blocked;//被封鎖了
                     String banMsg = String.format("You have been banned. \nReason: %s. \nExpire date: %s",
                             user.getBanReason(), user.getBanExpireDate().toLocalDateTime());
                     c.write(WvsContext.broadcastMsg(BroadcastMsg.popUpMessage(banMsg)));
@@ -170,6 +173,7 @@ public class LoginHandler {
             success = false;
         }
         c.write(Login.checkPasswordResult(success, result, user));
+        handleWorldInfoRequest(c, inPacket);
     }
 
     @Handler(op = InHeader.WORLD_LIST_REQUEST)
@@ -184,6 +188,7 @@ public class LoginHandler {
     @Handler(op = InHeader.WORLD_INFO_REQUEST)
     public static void handleWorldInfoRequest(Client c, InPacket packet) {
         for (World world : Server.getInstance().getWorlds()) {
+
             c.write(Login.sendWorldInformation(world, null));
         }
         c.write(Login.sendWorldInformationEnd());

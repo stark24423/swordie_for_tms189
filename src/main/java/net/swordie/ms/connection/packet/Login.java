@@ -49,10 +49,11 @@ public class Login {
     }
 
     public static OutPacket setLoginBackground() {
-        OutPacket outPacket = new OutPacket(OutHeader.SET_LOGIN_BACKGROUND);
+        OutPacket outPacket = new OutPacket(OutHeader.CHANGE_BACKGROUND);
         String[] bg = {"MapLogin", "MapLogin0", "MapLogin1", "MapLogin2"};
         outPacket.encodeString(bg[(int) (Math.random() * bg.length)]);
-        outPacket.encodeInt();
+        outPacket.encodeInt(0);
+        outPacket.encodeByte(1);
 
         return outPacket;
     }
@@ -77,31 +78,29 @@ public class Login {
         OutPacket outPacket = new OutPacket(OutHeader.CHECK_PASSWORD_RESULT.getValue());
 
         if (success) {
-            outPacket.encodeByte(LoginType.Success.getValue());
             outPacket.encodeByte(0);
-            outPacket.encodeInt(0);
-            outPacket.encodeString(user.getName());
+            outPacket.encodeByte(0);
+            outPacket.encodeByte(0);
             outPacket.encodeInt(user.getId());
             outPacket.encodeByte(user.getGender());
-            outPacket.encodeByte(user.getMsg2());
-            outPacket.encodeInt(user.getAccountType().getVal());
-            outPacket.encodeInt(user.getAge());
-            outPacket.encodeByte(!user.hasCensoredNxLoginID());
-            if (user.hasCensoredNxLoginID()) {
-                outPacket.encodeString(user.getCensoredNxLoginID());
-            }
+            outPacket.encodeByte(user.getAccountType().isGM());
+            outPacket.encodeInt(user.getAccountType().isGM()?0x10:0);
+            outPacket.encodeInt(0);
+            outPacket.encodeInt(0);
+            outPacket.encodeInt(0x21);
+            outPacket.encodeByte(0);
+            outPacket.encodeByte(0); // 1 = 帳號禁止說話
+            outPacket.encodeLong(user.getChatUnblockDate());
+            outPacket.encodeByte(0); // 1 = 帳號禁止說話
+            outPacket.encodeLong(user.getChatUnblockDate());
+            outPacket.encodeByte(0);
             outPacket.encodeString(user.getName());
-            outPacket.encodeByte(user.getpBlockReason());
-            outPacket.encodeByte(0); // idk
-            outPacket.encodeLong(user.getChatUnblockDate());
-            outPacket.encodeLong(user.getChatUnblockDate());
-            outPacket.encodeInt(user.getCharacterSlots() + 3);
+            outPacket.encodeShort(0); // idk
             JobConstants.encode(outPacket);
-            outPacket.encodeByte(user.getGradeCode());
+            outPacket.encodeByte(0);
             outPacket.encodeInt(-1);
-            outPacket.encodeByte(0); // idk
-            outPacket.encodeByte(0); // ^
-            outPacket.encodeFT(user.getCreationDate());
+            outPacket.encodeByte(0); // id
+
         } else if (msg == LoginType.Blocked) {
             outPacket.encodeByte(msg.getValue());
             outPacket.encodeByte(0);
@@ -133,13 +132,14 @@ public class Login {
         // CLogin::OnWorldInformation
         OutPacket outPacket = new OutPacket(OutHeader.WORLD_INFORMATION.getValue());
 
-        outPacket.encodeByte(world.getWorldId());
-        outPacket.encodeString(world.getName());
-        outPacket.encodeByte(world.getWorldState());
-        outPacket.encodeString(world.getWorldEventDescription());
+        outPacket.encodeByte(world.getWorldId());   //開哪個伺服器
+        outPacket.encodeString(world.getName());    //伺服器名稱
+        outPacket.encodeByte(world.getWorldState());//狀態
+        outPacket.encodeString(world.getWorldEventDescription());//伺服器資訊
         outPacket.encodeShort(world.getWorldEventEXP_WSE());
         outPacket.encodeShort(world.getWorldEventDrop_WSE());
-        outPacket.encodeByte(world.isCharCreateBlock());
+
+        //outPacket.encodeByte(world.isCharCreateBlock());//好像沒有這個
         outPacket.encodeByte(world.getChannels().size());
         for (Channel c : world.getChannels()) {
             outPacket.encodeString(c.getName());
@@ -226,19 +226,13 @@ public class Login {
         int reserved = 0;
         outPacket.encodeInt(reserved); // Reserved size
         outPacket.encodeFT(FileTime.fromType(FileTime.Type.ZERO_TIME)); //Reserved timestamp
-        for (int i = 0; i < reserved; i++) {
-            // not really interested in this
-            FileTime ft = FileTime.fromType(FileTime.Type.ZERO_TIME);
-            outPacket.encodeInt(ft.getLowDateTime());
-            ft.encode(outPacket);
-        }
         boolean isEdited = false;
         outPacket.encodeByte(isEdited); // edited characters
         List<Char> chars = new ArrayList<>(account.getCharacters());
         chars.sort(Comparator.comparingInt(Char::getId));
         int orderSize = chars.size();
         outPacket.encodeInt(orderSize);
-        for (Char chr : chars) {
+        for (Char chr : chars) {//腳色ID
             // order of chars
             outPacket.encodeInt(chr.getId());
         }
@@ -258,9 +252,12 @@ public class Login {
         outPacket.encodeInt(user.getCharacterSlots());
         outPacket.encodeInt(0); // buying char slots
         outPacket.encodeInt(-1); // nEventNewCharJob
+        outPacket.encodeByte(0);
         outPacket.encodeFT(FileTime.fromType(FileTime.Type.ZERO_TIME));
         outPacket.encodeByte(0); // nRenameCount
         outPacket.encodeByte(0);
+        outPacket.encodeInt(0);
+        outPacket.encodeFT(FileTime.fromType(FileTime.Type.ZERO_TIME));
 
         return outPacket;
     }

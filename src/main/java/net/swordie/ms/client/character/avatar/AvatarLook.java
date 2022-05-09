@@ -271,15 +271,17 @@ public class AvatarLook {
                 outPacket.encodeInt(0);
             }
         }
-        if (JobConstants.isZero((short) getJob())) {
-             outPacket.encodeByte(isZeroBetaLook());
+        if (JobConstants.isDemon((short) getJob())) {//惡魔
+            outPacket.encodeInt(getDemonSlayerDefFaceAcc());
         }
         if (JobConstants.isXenon((short) getJob())) {
             outPacket.encodeInt(getXenonDefFaceAcc());
         }
-        if (JobConstants.isDemon((short) getJob())) {
-            outPacket.encodeInt(getDemonSlayerDefFaceAcc());
+        if (JobConstants.isZero((short) getJob())) {
+             outPacket.encodeByte(isZeroBetaLook());
         }
+
+
         if (JobConstants.isBeastTamer((short) getJob())) {
             boolean hasEars = getEars() > 0;
             boolean hasTail = getTail() > 0;

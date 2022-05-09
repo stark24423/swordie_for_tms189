@@ -108,6 +108,13 @@ public class OutPacket extends Packet {
         baos.writeBytes(bArr);
     }
 
+    public void encodeZero(int num){
+        for(int i= 0 ;i<num;i++){
+            encodeByte(0);
+        }
+
+    }
+
     /**
      * Encodes a byte array to this OutPacket.
      *
